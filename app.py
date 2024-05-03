@@ -176,13 +176,15 @@ def signup2():
     name = request.form['Enter_name_for_signup']
     email = request.form['Enter_email_for_sigup']
     password = request.form['Enter_password_for_signup']
+    User_Types=request.form['Roles_SS']
     # Hash the password before storing it
+    print(User_Types)
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     try:
         # Insert the user data into the database
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', (name, email, hashed_password))
+        cursor.execute('INSERT INTO users (name, email, password,user_type) VALUES (?, ?, ?,?)', (name, email, hashed_password,User_Types))
         db.commit()
        # return redirect(url_for('login'))
         return render_template("/Login/accountcreation.html")
@@ -193,7 +195,6 @@ def signup2():
 def auth():
     email = request.form['User_Email']
     password = request.form['User_Password']
-
     # Hash the provided password for comparison
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
@@ -202,15 +203,17 @@ def auth():
     cursor = db.cursor()
     cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
     user = cursor.fetchone()
-
     # Check if user exists and passwords match
-    # if user and user[3] == hashed_password:
-    #     # return f'Welcome, {user[1]}!'
-    #     session['user_id'] = user[0]
-    #     # user_id=session.get('user_id')
-    #     return render_template('/ChatBot/chatbot.html')
-    # else:
-    return render_template("/Login/Invalidemail.html")
+    session['User_Type'] = user[4]
+    User_Type=session.get('User_Type')
+    if user and user[3] == hashed_password:
+        if User_Type=="Super Visor":
+            
+            return render_template("/create_menu.html")
+        else:
+            return User_Type
+    else:
+        return render_template("/Login/Invalidemail.html")
 
 @app.route("/signup")
 def signup():
