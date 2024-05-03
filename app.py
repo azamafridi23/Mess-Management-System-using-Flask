@@ -209,7 +209,7 @@ def auth():
     if user and user[3] == hashed_password:
         if User_Type=="Super Visor":
             
-            return render_template("/create_menu.html")
+            return render_template("/display_menu.html")
         else:
             return User_Type
     else:
