@@ -17,10 +17,20 @@
                 <div class="form-value">
                     <form  method="post" action="/signup2">
                         <h2>Sign Up</h2>
+                        <div class="inputbox">
+
+                            <!-- <label for="Roles_SS">Choose Your Role</label>  -->
+                            <select name="Roles_SS" id="Roles"> 
+                            <option value="Student">Student</option> 
+                           <option value="Super Visor">Super Visor</option> 
+         </select>
+     </div>
                         <div class="inputbox"> <input type="name"  name="Enter_name_for_signup"
                             required>
                            <label>Name</label>
                        </div>
+  
+
                         <div class="inputbox"> <ion-icon name="mail-outline"></ion-icon> <input type="email" required name="Enter_email_for_sigup">
                             <label>Email</label>
                         </div>
