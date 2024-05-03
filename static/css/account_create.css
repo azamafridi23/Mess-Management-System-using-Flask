@@ -1,0 +1,27 @@
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.response-container {
+    text-align: center;
+}
+
+.tick-image {
+    width: 100px; /* Adjust the size as needed */
+    margin-bottom: 20px;
+}
+#Response{
+    background-color: rgba(0, 128, 0, 0.567);
+    width: 30%;
+    border-radius: 5%;
+}
+
+#but1{
+    background-color:  rgba(0, 128, 0, 0.567);
+    border-radius: 2px solid rgba(0, 128, 0, 0.567);
+    text-align: center;
+}

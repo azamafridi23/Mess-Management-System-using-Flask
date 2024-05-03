@@ -1,0 +1,179 @@
+
+*{
+    padding: 0%;
+    margin: 0%;
+}
+.FullBody{
+    position: absolute;
+    width: 70%;
+    height: 80%;
+    /* background-color: aquamarine; */
+    left: 15%;
+    top:10%;
+    display: block;
+    /* border-radius: 3%; */
+    /* background-image: url('/static/Images/C_image.jpg');
+    background-repeat:initial;
+    background-attachment: fixed;
+    background-size: cover; */
+    background-color: rgba(228, 228, 216, 0.819);
+
+}
+.HeadPortion{
+    height:15%;
+    width: 100%;
+    /* text-align: center; */
+    background: rgba(169, 164, 164, 0.6)!important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; 
+    /* border-top-left-radius: 6%; */
+}
+#Head_Image{
+    margin: 0%;
+    padding: 0%;
+}
+#Head_Image{
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    text-align: center;
+}
+
+.ChatBotBody{
+    position:inherit;
+   height:70%;
+   width:100%;
+   /* background-color: rgb(218, 207, 207); */
+   overflow-x: hidden;
+    overflow-y: auto;
+   display: block;
+}
+.ChatbotBottom{
+    position: inherit;
+    bottom: 0%;
+    width: 100%;
+    height: 15%;
+    /* background-color: burlywood; */
+    background: rgba(169, 164, 164, 0.6)!important;
+}
+#Query{
+    padding:0%;
+    margin: 0%;
+}
+#Query{
+    position:inherit;
+    bottom: 20%;
+    padding:2%;
+    border-radius: 10px;
+    right: 25%;
+    width: 40%;
+
+}
+#image{
+    position:inherit;
+    /* height: 20%;
+    bottom: 40%; */
+    height: 2%;
+    width: 5%;
+    left: 5%;
+    bottom: 20%;
+}
+input[type="file"] {
+    display: none;
+}
+#Input_Icon{
+    margin: 0%;
+    padding: 0%;
+}
+#Input_Icon{
+    float: left;
+    margin-left: 23%;
+    margin-top: 1%;
+    width: 5%;
+    height: auto;
+    max-width: 100%;
+    height: auto;
+
+}
+
+#Send_message_icon{
+    float: right;
+    margin-right: 20%;
+    padding-top: 1%;
+    bottom: 20%;
+}
+p{
+    margin-top: 2%;
+    min-width: 4%; /* Set a minimum width */
+    max-width: 50%; /* Set a maximum width */
+    min-height: 4%; /* Set a minimum height */
+    max-height: 50%;
+    float: right;
+    display: block;
+    clear: both;
+    overflow-y: auto;
+    overflow-x: auto;
+    /* border: 5% solid  rgb(102, 101, 104); */
+    background-color: rgb(102, 101, 104);
+    margin-right:2%;
+    border-radius: 2%;
+    color:white;
+    padding: 1%;
+    border-radius: 25px;
+    text-align: center;
+    box-shadow: rgba(73, 73, 74, 0.6) 0px 2px 5px 2px;
+}
+img{
+    margin: 2%;
+    float: right;
+    display: block;
+    clear: both;
+    border-radius: 25px;
+}
+@media only screen and (max-width: 768px) {
+    #Input_Icon{
+        content: url('/static/Images/photo-tablet.png');
+        position:static;
+        width: 45px;
+        height: 45px;
+        margin-left: 18%;
+        margin-top: 5%;
+    
+
+    }
+    #Send_message_icon{
+    content: url('/static/Images/paper-plane\ \(2\).png');
+    position: static;
+    margin-top: 6%;
+    width: 30px;
+    height: 30px;
+    margin-right: 17%;
+    }
+
+}
+/* Media query for phones */
+@media only screen and (max-width: 510px) {
+ 
+  #Input_Icon{
+    content: url('/static/Images/photo-camera-phone.png');
+    position:static;
+    width: 30px;
+    height: 30px;
+    margin-left: 18%;
+    margin-top: 9%;
+  
+
+  }
+  #Send_message_icon{
+    content: url('/static/Images/paper-plane\ \(1\).png');
+    position: static;
+    margin-top: 9%;
+    width: 25px;
+    height: 25px;
+    margin-right: 16%;
+  }
+  
+ 
+}

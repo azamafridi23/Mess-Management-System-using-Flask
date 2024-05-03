@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Menu</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Breakfast</th>
+                <th>Lunch</th>
+                <th>Dinner</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in menu_data %}
+            <tr>
+                <td>{{ item[1] }}</td> <!-- Day -->
+                <td>{{ item[2] }}</td> <!-- Breakfast -->
+                <td>{{ item[3] }}</td> <!-- Lunch -->
+                <td>{{ item[4] }}</td> <!-- Dinner -->
+                <td>
+                    <a href="/menu/{{ item[0] }}/update">Update</a>
+                </td>    
+                <td>
+                    <a href="/menu/{{ item[0] }}/delete">Delete</a>
+                </td>                              
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
