@@ -34,9 +34,7 @@ def create_table_for_menu(conn):
         conn.commit()
     except sqlite3.Error as e:
         print(e)
-<<<<<<< HEAD
-=======
-
+        
 # azam code
 def create_connection_for_check_mess():
     DATABASE1 = 'ld.db'
@@ -344,7 +342,6 @@ def student_check_mess_bill():
     else:
         return 'Database connection error', 500
 
->>>>>>> 8b3bdc93188feb6762274666c0aac0ac665e0334
 @app.route('/display_menu')
 def display_menu():
     u_type = session.get('User_Type')
@@ -524,11 +521,7 @@ def signup2():
         cursor = db.cursor()
         cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
         existing_user = cursor.fetchone()
-<<<<<<< HEAD
-        session.pop('_flashes', None)
-=======
         print(existing_user)
->>>>>>> 8b3bdc93188feb6762274666c0aac0ac665e0334
         if existing_user:
             flash('Account already exists!', 'error')
             return redirect(url_for('signup_function'))  # Redirect back to sign-up function
@@ -537,18 +530,12 @@ def signup2():
             cursor.execute('INSERT INTO users (name, email, password, user_type) VALUES (?, ?, ?, ?)', (name, email, hashed_password, user_type))
             db.commit()
             flash('Account created successfully!', 'success')
-<<<<<<< HEAD
-            return render_template("/Login/SignIn.html")
-            # else:
-            #     return f"Wellcome to {user_type} Webpage"# Redirect back to sign-up function
-=======
             print("Hello")
             print(existing_user)
             if user_type=="Supervisor":
                 return render_template("/display_menu.html")
             else:
                 return f"Wellcome to {user_type} Webpage"# Redirect back to sign-up function
->>>>>>> 8b3bdc93188feb6762274666c0aac0ac665e0334
     except sqlite3.IntegrityError:
         flash('Error creating account!', 'error')
         return redirect(url_for('signup_function'))  # Redirect back to sign-up function
@@ -565,22 +552,14 @@ def auth():
     cursor = db.cursor()
     cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
     user = cursor.fetchone()
-<<<<<<< HEAD
-    # session.pop('_flashes', None)
-=======
     session['user_id'] = user[0]
->>>>>>> 8b3bdc93188feb6762274666c0aac0ac665e0334
     # Check if user exists and passwords match
     session['User_Type'] = user[4]
     User_Type=session.get('User_Type')
     if user and user[3] == hashed_password:
         if User_Type=="Supervisor":
-<<<<<<< HEAD
-            return redirect(url_for('display_menu'))
-=======
             
             return render_template("/display_menu.html")
->>>>>>> 8b3bdc93188feb6762274666c0aac0ac665e0334
         else:
             return User_Type
     else:
