@@ -1,4 +1,5 @@
-from flask import Flask ,render_template,jsonify,request, redirect, url_for, g,session
+from flask import Flask ,render_template,jsonify,request, redirect, url_for, g,session,flash
+import time
 import os
 import hashlib
 import sqlite3
@@ -147,7 +148,7 @@ def setup_Users():
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
-        email TEXT,
+        email TEXT UNIQUE,
         password TEXT,
         user_type TEXT DEFAULT 'Student',
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -170,29 +171,39 @@ def index():
 @app.route("/login")
 def signin():
     return render_template("/Login/SignIn.html")
-
-
 @app.route('/signup2', methods=['POST'])
 def signup2():
-    setup_Users()
+    setup_Users()  # Assuming this is a function to set up the database
     name = request.form['Enter_name_for_signup']
     email = request.form['Enter_email_for_sigup']
     password = request.form['Enter_password_for_signup']
-    User_Types=request.form['Roles_SS']
-    # Hash the password before storing it
-    print(User_Types)
+    user_type = request.form['Roles_SS']
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     try:
-        # Insert the user data into the database
+        # Check if the user already exists
         db = get_db()
         cursor = db.cursor()
-        cursor.execute('INSERT INTO users (name, email, password,user_type) VALUES (?, ?, ?,?)', (name, email, hashed_password,User_Types))
-        db.commit()
-       # return redirect(url_for('login'))
-        return render_template("/Login/accountcreation.html")
+        cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
+        existing_user = cursor.fetchone()
+        print(existing_user)
+        if existing_user:
+            flash('Account already exists!', 'error')
+            return redirect(url_for('signup_function'))  # Redirect back to sign-up function
+        else:
+            # Insert the user data into the database
+            cursor.execute('INSERT INTO users (name, email, password, user_type) VALUES (?, ?, ?, ?)', (name, email, hashed_password, user_type))
+            db.commit()
+            flash('Account created successfully!', 'success')
+            print("Hello")
+            print(existing_user)
+            if user_type=="Supervisor":
+                return render_template("/display_menu.html")
+            else:
+                return f"Wellcome to {user_type} Webpage"# Redirect back to sign-up function
     except sqlite3.IntegrityError:
-        return render_template("/Login/AccountExist.html")
-    
+        flash('Error creating account!', 'error')
+        return redirect(url_for('signup_function'))  # Redirect back to sign-up function
+   
 @app.route('/auth', methods=['POST'])
 def auth():
     email = request.form['User_Email']
@@ -216,6 +227,9 @@ def auth():
             return User_Type
     else:
         return render_template("/Login/Invalidemail.html")
+@app.route('/signup', methods=['GET'])
+def signup_function():
+    return render_template('/Login/signup.html')  # Render your sign-up page
 
 @app.route("/signup")
 def signup():
