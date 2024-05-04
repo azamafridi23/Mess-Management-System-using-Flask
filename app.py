@@ -122,7 +122,7 @@ def checkin():
                     last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
                     diff = (current_date - last_entry_date).days
                     print(f'diff = {diff}')
-                    if current_time.hour > 11:
+                    if current_time.hour > 13:
                         return 'NOT ALLOWED TO MESS IN AFTER 11',200
                     elif last_entry[2]=='IN':
                         return 'ALREADY MESS IN',200
@@ -149,7 +149,7 @@ def checkin():
                     last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
                     diff = (current_date - last_entry_date).days
                     print(f'diff = {diff}')
-                    if current_time.hour > 11:
+                    if current_time.hour > 13:
                         return 'NOT ALLOWED TO MESS IN AFTER 11',200
                     elif last_entry[2]=='IN':
                         return 'ALREADY MESS IN',200
@@ -202,7 +202,7 @@ def checkout():
                     last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
                     diff = (current_date - last_entry_date).days
                     print(f'diff = {diff}')
-                    if current_time.hour > 11:
+                    if current_time.hour > 13:
                         return 'NOT ALLOWED TO MESS OUT AFTER 11',200
                     elif last_entry[2]=='OUT':
                         return 'ALREADY MESS OUT',200
@@ -228,7 +228,7 @@ def checkout():
                     last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
                     diff = (current_date - last_entry_date).days
                     print(f'diff = {diff}')
-                    if current_time.hour > 11:
+                    if current_time.hour > 13:
                         return 'NOT ALLOWED TO MESS OUT AFTER 11',200
                     elif last_entry[2]=='OUT':
                         return 'ALREADY MESS OUT',200
@@ -272,11 +272,16 @@ def student_check_mess_bill():
 
         bf_check=True
         ld_check=True
+        
+        total_bf_days = 0
+        total_ld_days = 0
 
         if last_entry_ld is None and last_entry_bf is None:
             return 'MESS WAS NOT IN. SO BILL IS 0',200
         elif last_entry_bf is None:
             bf_check=False
+        elif last_entry_ld is None:
+            ld_check=False
 
         if bf_check:
             last_entry_date_bf = datetime.strptime(last_entry_bf[3], "%Y-%m-%d").date()
@@ -294,9 +299,10 @@ def student_check_mess_bill():
 
             total_bf_price = total_bf_days * BF_PRICE
         elif bf_check:
+            total_bf_days = last_entry_bf[5]
             total_bf_price = last_entry_bf[5] * BF_PRICE
         
-        if last_entry_ld[2]=='IN':
+        if ld_check and last_entry_ld[2]=='IN':
             last_entry_date_ld = datetime.strptime(last_entry_ld[3], "%Y-%m-%d").date()
             diff = (current_date-last_entry_date_ld).days
 
@@ -304,6 +310,7 @@ def student_check_mess_bill():
 
             total_ld_price = total_ld_days * LD_PRICE
         elif ld_check:
+            total_ld_days = last_entry_ld[5]
             total_ld_price = last_entry_ld[5] * LD_PRICE
         
         total_bill = total_bf_price + total_ld_price
