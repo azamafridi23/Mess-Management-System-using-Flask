@@ -79,12 +79,31 @@ def create_table_for_check_mess(conn1,conn2):
     except sqlite3.Error as e:
         print(e)
         return 'failed'
+    
+
+def temp_db_cmnds():
+    conn_ld,conn_bf = create_connection_for_check_mess()
+    cursor = conn_bf.cursor()
+    cursor.execute('''INSERT INTO BREAKFAST (User_id, Check_status, Date,Time,Counter) VALUES (?, ?, ?, ?,?)''', (1,'IN',"2024-05-01","11:18:11",1))
+    conn_bf.commit()
+    cursor.close()
+
+    cursor = conn_ld.cursor()
+    cursor.execute('''INSERT INTO LD (User_id, Check_status, Date,Time,Counter) VALUES (?, ?, ?, ?,?)''', (1,'IN',"2024-05-01","11:18:11",1))
+    conn_ld.commit()
+    cursor.close()
+
+    conn_ld.close()
+    conn_bf.close()
 
 
-
-@app.route('/student_checkin',methods=['POST'])
+@app.route('/student_checkin',methods=['GET','POST'])
 def checkin():
-    print(f'came in student_checkin')
+    print(f'came in student_checkin2')
+    if request.method == 'GET':
+        return render_template("/mess_checkin.html")
+    
+    # Else its post request
     conn_ld,conn_bf = create_connection_for_check_mess()
     if conn_ld is not None and conn_bf is not None:
         try:
@@ -92,10 +111,12 @@ def checkin():
             # temp_db_cmnds()
             if result =='fail':
                 return 'TABLE LD AND BF CREATION ERROR', 500
-            data = request.json # change to change.form
+            
+            data = request.form # change to change.form
             print(f'data = {data}')
-            user_id = data['user_id']
+            user_id = session.get('user_id')
             meal_type = data['meal_type']
+            
             # Get the current date
             current_date = datetime.now().date()
             current_time = datetime.now().time()
@@ -122,7 +143,7 @@ def checkin():
                     last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
                     diff = (current_date - last_entry_date).days
                     print(f'diff = {diff}')
-                    if current_time.hour > 13:
+                    if current_time.hour > 20:
                         return 'NOT ALLOWED TO MESS IN AFTER 11',200
                     elif last_entry[2]=='IN':
                         return 'ALREADY MESS IN',200
@@ -149,7 +170,7 @@ def checkin():
                     last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
                     diff = (current_date - last_entry_date).days
                     print(f'diff = {diff}')
-                    if current_time.hour > 13:
+                    if current_time.hour > 20:
                         return 'NOT ALLOWED TO MESS IN AFTER 11',200
                     elif last_entry[2]=='IN':
                         return 'ALREADY MESS IN',200
@@ -166,19 +187,23 @@ def checkin():
             return 'STUDENT_CHECKIN VIEW ERROR', 500
     else:
         return 'Database connection error', 500
-    
-@app.route('/student_checkout',methods=['POST'])
+
+@app.route('/student_checkout',methods=['GET','POST'])
 def checkout():
     print(f'came in student_checkout')
+    if request.method == 'GET':
+        return render_template("/mess_checkin.html")
+    
+    # else its a post request
     conn_ld,conn_bf = create_connection_for_check_mess()
     if conn_ld is not None and conn_bf is not None:
         try:
             result = create_table_for_check_mess(conn1=conn_ld,conn2=conn_bf)
             if result =='fail':
                 return 'TABLE LD AND BF CREATION ERROR', 500
-            data = request.json # change to change.form
+            data = request.form # change to change.form
             print(f'data = {data}')
-            user_id = data['user_id']
+            user_id = session.get('user_id')
             meal_type = data['meal_type']
             # Get the current date
             current_date = datetime.now().date()
@@ -202,7 +227,7 @@ def checkout():
                     last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
                     diff = (current_date - last_entry_date).days
                     print(f'diff = {diff}')
-                    if current_time.hour > 13:
+                    if current_time.hour > 20:
                         return 'NOT ALLOWED TO MESS OUT AFTER 11',200
                     elif last_entry[2]=='OUT':
                         return 'ALREADY MESS OUT',200
@@ -228,7 +253,7 @@ def checkout():
                     last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
                     diff = (current_date - last_entry_date).days
                     print(f'diff = {diff}')
-                    if current_time.hour > 13:
+                    if current_time.hour > 20:
                         return 'NOT ALLOWED TO MESS OUT AFTER 11',200
                     elif last_entry[2]=='OUT':
                         return 'ALREADY MESS OUT',200
@@ -246,15 +271,13 @@ def checkout():
     else:
         return 'Database connection error', 500
     
-@app.route('/student_check_messbill',methods=['POST'])
+@app.route('/student_check_messbill',methods=['GET','POST'])
 def student_check_mess_bill():
     BF_PRICE = 100
     LD_PRICE = 200
     conn_ld,conn_bf = create_connection_for_check_mess()
     if conn_ld is not None and conn_bf is not None:
-        data = request.json # change to change.form
-        print(f'data = {data}')
-        user_id = data['user_id']
+        user_id = session.get('user_id')
         cursor_bf = conn_bf.cursor()
         sql_query = "SELECT * FROM BREAKFAST WHERE User_id = ? ORDER BY id DESC LIMIT 1" # select last entry of User_id
         # Execute the query with user_id=1
@@ -318,23 +341,6 @@ def student_check_mess_bill():
         return f'total bill = {total_bill} because of {total_bf_days} Breakfasts and {total_ld_days} lunch&dinners',200
     else:
         return 'Database connection error', 500
-    
-
-def temp_db_cmnds():
-    conn_ld,conn_bf = create_connection_for_check_mess()
-    cursor = conn_bf.cursor()
-    cursor.execute('''INSERT INTO BREAKFAST (User_id, Check_status, Date,Time,Counter) VALUES (?, ?, ?, ?,?)''', (1,'IN',"2024-05-01","11:18:11",1))
-    conn_bf.commit()
-    cursor.close()
-
-    cursor = conn_ld.cursor()
-    cursor.execute('''INSERT INTO LD (User_id, Check_status, Date,Time,Counter) VALUES (?, ?, ?, ?,?)''', (1,'IN',"2024-05-01","11:18:11",1))
-    conn_ld.commit()
-    cursor.close()
-
-    conn_ld.close()
-    conn_bf.close()
-
 
 @app.route('/display_menu')
 def display_menu():
@@ -518,6 +524,7 @@ def auth():
     cursor = db.cursor()
     cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
     user = cursor.fetchone()
+    session['user_id'] = user[0]
     # Check if user exists and passwords match
     session['User_Type'] = user[4]
     User_Type=session.get('User_Type')

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mess In-Out</title>
+<style>
+    /* Add your CSS styles here */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .container {
+        text-align: center;
+    }
+    .checkbox-label {
+        margin-right: 10px;
+    }
+    .input-field {
+        margin-top: 10px;
+    }
+    .submit-button {
+        margin-top: 20px;
+    }
+</style>
+<link rel="stylesheet" href="{{url_for('static' ,filename='css/style_for_mess_checkin.css')}}">
+</head>
+<body>
+
+    
+<div class="container text-center text-big">
+    <h2>Mess In-Out</h2>
+    <form id="messForm" method="post">
+        <label class="checkbox-label">
+            <input type="radio" name="status" value="IN">
+            Mess In
+        </label>
+        <label class="checkbox-label">
+            <input type="radio" name="status" value="OUT">
+            Mess Out
+        </label>
+        <br>
+        <select name="meal_type">
+            <option value="bf">Breakfast</option>
+            <option value="ld">Dinner or Lunch</option>
+        </select>
+        <!-- <div class="form-input">
+            
+            <input type="datetime-local" id="dateTime" name="dateTime">
+        </div> -->
+        <button class="btn btn-dark" type="submit">submit</button>
+      
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById('messForm');
+    const messInRadio = document.querySelector('input[value="IN"]');
+    const messOutRadio = document.querySelector('input[value="OUT"]');
+
+    messInRadio.addEventListener('change', function() {
+        form.action = '/student_checkin';
+    });
+
+    messOutRadio.addEventListener('change', function() {
+        form.action = '/student_checkout2';
+    });
+</script>
+</body>
+</html>
