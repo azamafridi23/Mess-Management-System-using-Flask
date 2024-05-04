@@ -88,6 +88,7 @@ def checkin():
     if conn_ld is not None and conn_bf is not None:
         try:
             result = create_table_for_check_mess(conn1=conn_ld,conn2=conn_bf)
+            temp_db_cmnds()
             if result =='fail':
                 return 'TABLE LD AND BF CREATION ERROR', 500
             data = request.json # change to change.form
@@ -244,13 +245,87 @@ def checkout():
     else:
         return 'Database connection error', 500
     
+@app.route('/student_check_messbill',methods=['POST'])
+def student_check_mess_bill():
+    BF_PRICE = 100
+    LD_PRICE = 200
+    conn_ld,conn_bf = create_connection_for_check_mess()
+    if conn_ld is not None and conn_bf is not None:
+        data = request.json # change to change.form
+        print(f'data = {data}')
+        user_id = data['user_id']
+        cursor_bf = conn_bf.cursor()
+        sql_query = "SELECT * FROM BREAKFAST WHERE User_id = ? ORDER BY id DESC LIMIT 1" # select last entry of User_id
+        # Execute the query with user_id=1
+        cursor_bf.execute(sql_query, (user_id,))
+        # Fetch the result
+        last_entry_bf = cursor_bf.fetchone()
 
 
+        cursor_ld = conn_ld.cursor()
+        sql_query = "SELECT * FROM LD WHERE User_id = ? ORDER BY id DESC LIMIT 1" # select last entry of User_id
+        # Execute the query with user_id=1
+        cursor_ld.execute(sql_query, (user_id,))
+        # Fetch the result
+        last_entry_ld = cursor_ld.fetchone()
+
+        bf_check=True
+        ld_check=True
+
+        if last_entry_ld is None and last_entry_bf is None:
+            return 'MESS WAS NOT IN. SO BILL IS 0',200
+        elif last_entry_bf is None:
+            bf_check=False
+
+        if bf_check:
+            last_entry_date_bf = datetime.strptime(last_entry_bf[3], "%Y-%m-%d").date()
+        if ld_check:    
+            last_entry_date_ld = datetime.strptime(last_entry_ld[3], "%Y-%m-%d").date()
+        current_date = datetime.now().date()
+
+        total_bf_price = 0
+        total_ld_price = 0
+        if bf_check and last_entry_bf[2]=='IN':
+            last_entry_date_bf = datetime.strptime(last_entry_bf[3], "%Y-%m-%d").date()
+            diff = (current_date-last_entry_date_bf).days
+
+            total_bf_days = last_entry_bf[5]+diff
+
+            total_bf_price = total_bf_days * BF_PRICE
+        elif bf_check:
+            total_bf_price = last_entry_bf[5] * BF_PRICE
+        
+        if last_entry_ld[2]=='IN':
+            last_entry_date_ld = datetime.strptime(last_entry_ld[3], "%Y-%m-%d").date()
+            diff = (current_date-last_entry_date_ld).days
+
+            total_ld_days = last_entry_ld[5]+diff
+
+            total_ld_price = total_ld_days * LD_PRICE
+        elif ld_check:
+            total_ld_price = last_entry_ld[5] * LD_PRICE
+        
+        total_bill = total_bf_price + total_ld_price
+
+        return f'total bill = {total_bill} because of {total_bf_days} Breakfasts and {total_ld_days} lunch&dinners',200
+    else:
+        return 'Database connection error', 500
     
 
+def temp_db_cmnds():
+    conn_ld,conn_bf = create_connection_for_check_mess()
+    cursor = conn_bf.cursor()
+    cursor.execute('''INSERT INTO BREAKFAST (User_id, Check_status, Date,Time,Counter) VALUES (?, ?, ?, ?,?)''', (1,'IN',"2024-05-01","11:18:11",1))
+    conn_bf.commit()
+    cursor.close()
 
+    cursor = conn_ld.cursor()
+    cursor.execute('''INSERT INTO LD (User_id, Check_status, Date,Time,Counter) VALUES (?, ?, ?, ?,?)''', (1,'IN',"2024-05-01","11:18:11",1))
+    conn_ld.commit()
+    cursor.close()
 
-
+    conn_ld.close()
+    conn_bf.close()
 
 
 @app.route('/display_menu')
