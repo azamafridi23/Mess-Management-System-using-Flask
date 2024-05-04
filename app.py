@@ -36,6 +36,8 @@ def create_table_for_menu(conn):
 
 @app.route('/display_menu')
 def display_menu():
+    u_type = session.get('User_Type')
+    print(f'u_type = {u_type}')
     conn = create_connection_for_menu()
     if conn is not None:
         try:
@@ -148,7 +150,7 @@ def setup_Users():
         name TEXT,
         email TEXT UNIQUE,
         password TEXT,
-        user_type TEXT DEFAULT 'student',
+        user_type TEXT DEFAULT 'Student',
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     ''')
@@ -184,6 +186,7 @@ def signup2():
         cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
         existing_user = cursor.fetchone()
         print(existing_user)
+        session.pop('_flashes', None)
         if existing_user:
             flash('Account already exists!', 'error')
             return redirect(url_for('signup_function'))  # Redirect back to sign-up function
@@ -218,7 +221,7 @@ def auth():
     session['User_Type'] = user[4]
     User_Type=session.get('User_Type')
     if user and user[3] == hashed_password:
-        if User_Type=="Super Visor":
+        if User_Type=="Supervisor":
             
             return render_template("/display_menu.html")
         else:
