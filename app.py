@@ -2,6 +2,7 @@ from flask import Flask ,render_template,jsonify,request, redirect, url_for, g,s
 import os
 import hashlib
 import sqlite3
+from datetime import datetime
 app=Flask(__name__)
 app.secret_key = 'FullStackProject'
 DATABASE = 'users.db'
@@ -32,6 +33,225 @@ def create_table_for_menu(conn):
         conn.commit()
     except sqlite3.Error as e:
         print(e)
+
+# azam code
+def create_connection_for_check_mess():
+    DATABASE1 = 'ld.db'
+    DATABASE2 = 'breakfast.db'
+    conn1,conn2 = None,None
+    try:
+        conn1  = sqlite3.connect(DATABASE1)
+        conn2 = sqlite3.connect(DATABASE2)
+    except sqlite3.Error as e:
+        print(e)
+    return conn1,conn2
+
+def create_table_for_check_mess(conn1,conn2):
+    try:
+        cursor = conn1.cursor()
+        cursor.execute('''
+                CREATE TABLE IF NOT EXISTS LD (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                User_id INTEGER,
+                Check_status TEXT,
+                Date DATE,
+                Time TIME,
+                Counter INTEGER,
+                FOREIGN KEY (User_id) REFERENCES users(id)
+            )
+        ''')
+        conn1.commit()
+        cursor = conn2.cursor()
+        cursor.execute('''
+                CREATE TABLE IF NOT EXISTS BREAKFAST (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                User_id INTEGER,
+                Check_status TEXT,
+                Date DATE,
+                Time TIME,
+                Counter INTEGER,
+                FOREIGN KEY (User_id) REFERENCES users(id)
+            )
+        ''')
+        conn2.commit()
+        return 'ok'
+    except sqlite3.Error as e:
+        print(e)
+        return 'failed'
+
+
+
+@app.route('/student_checkin',methods=['POST'])
+def checkin():
+    print(f'came in student_checkin')
+    conn_ld,conn_bf = create_connection_for_check_mess()
+    if conn_ld is not None and conn_bf is not None:
+        try:
+            result = create_table_for_check_mess(conn1=conn_ld,conn2=conn_bf)
+            if result =='fail':
+                return 'TABLE LD AND BF CREATION ERROR', 500
+            data = request.json # change to change.form
+            print(f'data = {data}')
+            user_id = data['user_id']
+            meal_type = data['meal_type']
+            # Get the current date
+            current_date = datetime.now().date()
+            current_time = datetime.now().time()
+            
+            current_date_str = current_date.strftime('%Y-%m-%d')
+            current_time_str = current_time.strftime('%H:%M:%S')
+            if meal_type=='bf':
+                cursor = conn_bf.cursor()
+                sql_query = "SELECT * FROM BREAKFAST WHERE User_id = ? ORDER BY id DESC LIMIT 1" # select last entry of User_id
+                # Execute the query with user_id=1
+                cursor.execute(sql_query, (user_id,))
+                # Fetch the result
+                last_entry = cursor.fetchone()
+                # Print or process the last entry
+                print(f'le = ',last_entry)
+                
+                if last_entry is None:
+                    print('a')
+                    cursor.execute('''INSERT INTO BREAKFAST (User_id, Check_status, Date,Time, Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,1))
+                    print('b')
+                    conn_bf.commit()
+                    print('c')
+                else:
+                    last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
+                    diff = (current_date - last_entry_date).days
+                    print(f'diff = {diff}')
+                    if current_time.hour > 11:
+                        return 'NOT ALLOWED TO MESS IN AFTER 11',200
+                    elif last_entry[2]=='IN':
+                        return 'ALREADY MESS IN',200
+                    else:
+                        counter = last_entry[5] + diff
+                        cursor.execute('''INSERT INTO BREAKFAST (User_id, Check_status, Date,Time, Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,counter))
+                        conn_bf.commit()
+                # Don't forget to close the cursor and connection when done
+                cursor.close()
+                conn_bf.close()
+            elif meal_type=='ld':
+                cursor = conn_ld.cursor()
+                sql_query = "SELECT * FROM LD WHERE User_id = ? ORDER BY id DESC LIMIT 1" # select last entry of User_id
+                # Execute the query with user_id=1
+                cursor.execute(sql_query, (user_id,))
+                # Fetch the result
+                last_entry = cursor.fetchone()
+                # Print or process the last entry
+                print(f'last entry = {last_entry}')
+                if last_entry is None:
+                    cursor.execute('''INSERT INTO LD (User_id, Check_status, Date,Time, Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,1))
+                    conn_ld.commit()
+                else:
+                    last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
+                    diff = (current_date - last_entry_date).days
+                    print(f'diff = {diff}')
+                    if current_time.hour > 11:
+                        return 'NOT ALLOWED TO MESS IN AFTER 11',200
+                    elif last_entry[2]=='IN':
+                        return 'ALREADY MESS IN',200
+                    else:
+                        counter = last_entry[5] + diff
+                        cursor.execute('''INSERT INTO LD (User_id, Check_status, Date,Time,Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,counter))
+                        conn_ld.commit()
+                # Don't forget to close the cursor and connection when done
+                cursor.close()
+                conn_ld.close()
+            return 'ok'
+        except sqlite3.Error as e:
+            print('xx = ',e)
+            return 'STUDENT_CHECKIN VIEW ERROR', 500
+    else:
+        return 'Database connection error', 500
+    
+@app.route('/student_checkout',methods=['POST'])
+def checkout():
+    print(f'came in student_checkout')
+    conn_ld,conn_bf = create_connection_for_check_mess()
+    if conn_ld is not None and conn_bf is not None:
+        try:
+            result = create_table_for_check_mess(conn1=conn_ld,conn2=conn_bf)
+            if result =='fail':
+                return 'TABLE LD AND BF CREATION ERROR', 500
+            data = request.json # change to change.form
+            print(f'data = {data}')
+            user_id = data['user_id']
+            meal_type = data['meal_type']
+            # Get the current date
+            current_date = datetime.now().date()
+            current_time = datetime.now().time()
+            
+            current_date_str = current_date.strftime('%Y-%m-%d')
+            current_time_str = current_time.strftime('%H:%M:%S')
+            if meal_type=='bf':
+                cursor = conn_bf.cursor()
+                sql_query = "SELECT * FROM BREAKFAST WHERE User_id = ? ORDER BY id DESC LIMIT 1" # select last entry of User_id
+                # Execute the query with user_id=1
+                cursor.execute(sql_query, (user_id,))
+                # Fetch the result
+                last_entry = cursor.fetchone()
+                # Print or process the last entry
+                print(f'le = ',last_entry)
+                
+                if last_entry is None:
+                    return 'MESS ALREADY OUT',200
+                else:
+                    last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
+                    diff = (current_date - last_entry_date).days
+                    print(f'diff = {diff}')
+                    if current_time.hour > 11:
+                        return 'NOT ALLOWED TO MESS OUT AFTER 11',200
+                    elif last_entry[2]=='OUT':
+                        return 'ALREADY MESS OUT',200
+                    else:
+                        counter = last_entry[5] + diff
+                        cursor.execute('''INSERT INTO BREAKFAST (User_id, Check_status, Date,Time, Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'OUT',current_date_str,current_time_str,counter))
+                        conn_bf.commit()
+                # Don't forget to close the cursor and connection when done
+                cursor.close()
+                conn_bf.close()
+            elif meal_type=='ld':
+                cursor = conn_ld.cursor()
+                sql_query = "SELECT * FROM LD WHERE User_id = ? ORDER BY id DESC LIMIT 1" # select last entry of User_id
+                # Execute the query with user_id=1
+                cursor.execute(sql_query, (user_id,))
+                # Fetch the result
+                last_entry = cursor.fetchone()
+                # Print or process the last entry
+                print(f'last entry = {last_entry}')
+                if last_entry is None:
+                    return 'MESS ALREADY OUT',200
+                else:
+                    last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
+                    diff = (current_date - last_entry_date).days
+                    print(f'diff = {diff}')
+                    if current_time.hour > 11:
+                        return 'NOT ALLOWED TO MESS OUT AFTER 11',200
+                    elif last_entry[2]=='OUT':
+                        return 'ALREADY MESS OUT',200
+                    else:
+                        counter = last_entry[5] + diff
+                        cursor.execute('''INSERT INTO LD (User_id, Check_status, Date,Time,Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'OUT',current_date_str,current_time_str,counter))
+                        conn_ld.commit()
+                # Don't forget to close the cursor and connection when done
+                cursor.close()
+                conn_ld.close()
+            return 'ok'
+        except sqlite3.Error as e:
+            print('xx = ',e)
+            return 'STUDENT_CHECKIN VIEW ERROR', 500
+    else:
+        return 'Database connection error', 500
+    
+
+
+    
+
+
+
+
+
 
 @app.route('/display_menu')
 def display_menu():
