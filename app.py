@@ -554,7 +554,7 @@ def auth():
     if user and user[3] == hashed_password:
         if User_Type=="Supervisor":
             
-            return render_template("/display_menu.html")
+            return redirect(url_for("display_menu"))
         else:
             return User_Type
     else:
