@@ -33,7 +33,6 @@ def create_table_for_menu(conn):
         conn.commit()
     except sqlite3.Error as e:
         print(e)
-
 @app.route('/display_menu')
 def display_menu():
     u_type = session.get('User_Type')
@@ -51,11 +50,29 @@ def display_menu():
             return 'Failed to fetch menu data', 500
     else:
         return 'Database connection error', 500
-    
+
+@app.route('/display_menu_for_student')
+def display_menu2():
+    u_type = session.get('User_Type')
+    print(f'u_type = {u_type}')
+    conn = create_connection_for_menu()
+    if conn is not None:
+        try:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM menu')
+            menu_data = cursor.fetchall()
+            conn.close()
+            return render_template('display_menu_for_Student.html', menu_data=menu_data)
+        except sqlite3.Error as e:
+            print(e)
+            return 'Failed to fetch menu data', 500
+    else:
+        return 'Database connection error', 500
+
+  
 @app.route("/create_menu")
 def create_menu():
     return render_template("/create_menu.html")
-
 @app.route('/create_menu_auth', methods=['POST'])
 def create_menu_auth():
     conn = create_connection_for_menu()
@@ -67,6 +84,15 @@ def create_menu_auth():
         dinner = request.form['dinner']
         try:
             cursor = conn.cursor()
+            # Check if menu for the day already exists
+            cursor.execute('''
+                SELECT * FROM menu WHERE day = ?
+            ''', (day,))
+            existing_menu = cursor.fetchone()
+            if existing_menu:
+                return jsonify({'error': 'Menu for this day already exists '}), 400
+            
+            # If menu for the day doesn't exist, create a new one
             cursor.execute('''
                 INSERT INTO menu (day, breakfast, lunch, dinner) VALUES (?, ?, ?, ?)
             ''', (day, breakfast, lunch, dinner))
@@ -79,6 +105,7 @@ def create_menu_auth():
             return jsonify({'error': 'Failed to create menu'}), 500
     else:
         return jsonify({'error': 'Database connection error'}), 500
+
     
 @app.route('/menu/<int:menu_id>/update', methods=['GET', 'POST'])
 def update_menu(menu_id):
@@ -185,7 +212,6 @@ def signup2():
         cursor = db.cursor()
         cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
         existing_user = cursor.fetchone()
-        print(existing_user)
         session.pop('_flashes', None)
         if existing_user:
             flash('Account already exists!', 'error')
@@ -195,12 +221,9 @@ def signup2():
             cursor.execute('INSERT INTO users (name, email, password, user_type) VALUES (?, ?, ?, ?)', (name, email, hashed_password, user_type))
             db.commit()
             flash('Account created successfully!', 'success')
-            print("Hello")
-            print(existing_user)
-            if user_type=="Supervisor":
-                return render_template("/display_menu.html")
-            else:
-                return f"Wellcome to {user_type} Webpage"# Redirect back to sign-up function
+            return render_template("/Login/SignIn.html")
+            # else:
+            #     return f"Wellcome to {user_type} Webpage"# Redirect back to sign-up function
     except sqlite3.IntegrityError:
         flash('Error creating account!', 'error')
         return redirect(url_for('signup_function'))  # Redirect back to sign-up function
@@ -217,16 +240,18 @@ def auth():
     cursor = db.cursor()
     cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
     user = cursor.fetchone()
+    # session.pop('_flashes', None)
     # Check if user exists and passwords match
     session['User_Type'] = user[4]
     User_Type=session.get('User_Type')
     if user and user[3] == hashed_password:
         if User_Type=="Supervisor":
-            
-            return render_template("/display_menu.html")
+            return redirect(url_for('display_menu'))
         else:
             return User_Type
     else:
+        flash('Invalid Email or Password Try Again!', 'error')
+        return render_template("/Login/SignIn.html")
         return render_template("/Login/Invalidemail.html")
 @app.route('/signup', methods=['GET'])
 def signup_function():
