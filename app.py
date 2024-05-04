@@ -530,16 +530,11 @@ def signup2():
             cursor.execute('INSERT INTO users (name, email, password, user_type) VALUES (?, ?, ?, ?)', (name, email, hashed_password, user_type))
             db.commit()
             flash('Account created successfully!', 'success')
-            print("Hello")
-            print(existing_user)
-            if user_type=="Supervisor":
-                return render_template("/display_menu.html")
-            else:
-                return f"Wellcome to {user_type} Webpage"# Redirect back to sign-up function
+            return render_template("/Login/SignIn.html")
     except sqlite3.IntegrityError:
         flash('Error creating account!', 'error')
         return redirect(url_for('signup_function'))  # Redirect back to sign-up function
-   
+
 @app.route('/auth', methods=['POST'])
 def auth():
     email = request.form['User_Email']
@@ -565,7 +560,7 @@ def auth():
     else:
         flash('Invalid Email or Password Try Again!', 'error')
         return render_template("/Login/SignIn.html")
-        return render_template("/Login/Invalidemail.html")
+
 @app.route('/signup', methods=['GET'])
 def signup_function():
     return render_template('/Login/signup.html')  # Render your sign-up page
