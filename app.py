@@ -88,7 +88,7 @@ def checkin():
     if conn_ld is not None and conn_bf is not None:
         try:
             result = create_table_for_check_mess(conn1=conn_ld,conn2=conn_bf)
-            temp_db_cmnds()
+            # temp_db_cmnds()
             if result =='fail':
                 return 'TABLE LD AND BF CREATION ERROR', 500
             data = request.json # change to change.form
