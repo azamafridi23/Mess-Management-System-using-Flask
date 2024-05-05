@@ -1,4 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@1,300&display=swap');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <title>Student_portal</title>
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+    <link rel="stylesheet" href="{{url_for('static' ,filename='css/style.css')}}">
+   <script src="script.js" defer></script>
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@1,300&display=swap');
 .button {
     padding: 8px 20px;
 margin: 16px 3px;
@@ -389,3 +401,38 @@ padding-right: 25px;
 opacity: 1;
 right: 0;
 }
+</style>
+<body>
+    <section class="background firstsection" id="Home">
+        <div class="box-main">
+            <div class="firsthalf">
+                <p class="text-big">Hi Students</p>
+                <p class="text-small"> WellCome To GIKI Mess Management System (GMMS)</p> 
+                <p class="text-small">Students You Can do Below Operations.You can CheckIn Mess,Checkout Mess and Paid Monthly Bills Remotily</p>
+                <p class="text-small"> Explore our delicious Meals</p>
+                <div class="buttons">
+                    <button class="button" style="vertical-align:middle"><span><a href="/templates/Mess_In_out.html Mess_In_out.html" style="color: white; text-decoration: none;">Mess In/Out</a></span></button>
+                    <button class="button" style="vertical-align:middle"><span><a href="/templates/upload.html" style="color: white; text-decoration: none;">Bill Payment</a></span></button>
+                    <button class="button" style="vertical-align:middle" ><span><a href="/studentReveiw" style="color: white; text-decoration: none;">Review </a></span></button>
+                    <button class="button" style="vertical-align:middle" ><span><a href="/display_menu_for_student" style="color: white; text-decoration: none;">View Menu</a></span></button>
+                    <button class="button" style="vertical-align:middle" ><span><a href="#" style="color: white; text-decoration: none;">View Mess Bill</a></span></button>
+                </div>
+            </div> 
+        </div>
+
+    </section>
+</body>
+<!-- <script src="{{url_for('static' ,filename='js/script.js')}}"></script> -->
+<script>
+burger=document.querySelector('.burger')
+navbar=document.querySelector('.navbar')
+rightnav=document.querySelector('.rightnav')
+navlist=document.querySelector('.nav-list')
+
+burger.addEventListener('click',()=>{
+    rightnav.classList.toggle('v-class-resp');
+    navlist.classList.toggle('v-class-resp');
+    navbar.classList.toggle('h-nav-resp');
+})
+</script>
+</html>

@@ -7,8 +7,7 @@ from datetime import datetime
 app=Flask(__name__)
 app.secret_key = 'FullStackProject'
 DATABASE = 'users.db'
-
-
+DATABASE2 = 'reveiws.db'
 # azam code
 def create_connection_for_menu():
     DATABASE = 'menu.db'
@@ -476,7 +475,11 @@ def get_db():
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
     return db
-
+def get_db2():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE2)
+    return db
 def setup_Users():
     db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
@@ -492,7 +495,33 @@ def setup_Users():
     ''')
     db.commit()
     db.close()
-
+def setup_reveiws():
+    db = sqlite3.connect(DATABASE2)
+    cursor = db.cursor()
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS reveiws (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        phonenumber INTEGER,
+        email TEXT,
+        concern TEXT ,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )       
+    ''')
+    db.commit()
+    db.close()
+@app.route('/studentreveiws', methods=['POST'])
+def reveiws():
+    setup_reveiws()  # Assuming this is a function to set up the database
+    name = request.form['name']
+    phonenumber = request.form['phone']
+    email= request.form['email']
+    text = request.form['text']
+    db = get_db2()
+    cursor = db.cursor()
+    cursor.execute('INSERT INTO reveiws (name, phonenumber, email, concern) VALUES (?, ?, ?, ?)', (name, phonenumber, email, text))
+    db.commit()
+    return render_template("/Login/Sucess_Message.html")
 # Function to close the database connection
 @app.teardown_appcontext
 def close_connection(exception):
@@ -534,7 +563,24 @@ def signup2():
     except sqlite3.IntegrityError:
         flash('Error creating account!', 'error')
         return redirect(url_for('signup_function'))  # Redirect back to sign-up function
+#SuperVisor Portion 
+@app.route('/supervisorView')
+def supervisorView():
+    return render_template("/SuperVisorView.html")  
 
+
+@app.route('/aboutus')
+def aboutUs():
+    # return render_template("/templates/AboutUs/aboutus.html")   
+    return render_template("/AboutUs/Aboutus.html")
+    
+#Student Portion 
+@app.route('/studentView')
+def studentView():
+    return render_template("/StudentView.html")
+@app.route('/studentReveiw')
+def studentReview():
+    return render_template("/review.html")
 @app.route('/auth', methods=['POST'])
 def auth():
     email = request.form['User_Email']
@@ -554,9 +600,9 @@ def auth():
     if user and user[3] == hashed_password:
         if User_Type=="Supervisor":
             
-            return redirect(url_for("display_menu"))
+            return redirect(url_for("supervisorView"))
         else:
-            return User_Type
+            return redirect(url_for("studentView"))
     else:
         flash('Invalid Email or Password Try Again!', 'error')
         return render_template("/Login/SignIn.html")

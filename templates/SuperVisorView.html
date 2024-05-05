@@ -1,4 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@1,300&display=swap');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <title>Super Visor Portal</title>
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+    <link rel="stylesheet" href="{{url_for('static' ,filename='css/style.css')}}">
+   <script src="script.js" defer></script>
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@1,300&display=swap');
 .button {
     padding: 8px 20px;
 margin: 16px 3px;
@@ -389,3 +401,37 @@ padding-right: 25px;
 opacity: 1;
 right: 0;
 }
+</style>
+<body>
+    <section class="background firstsection" id="Home">
+        <div class="box-main">
+            <div class="firsthalf">
+                <p class="text-big">WellCome SuperVisor</p>
+                <p class="text-small"> GIKI Mess Management System (GMMS)</p> 
+                <p class="text-small">SuperVisor  Can do Below Operations.See Menu,Update Menu (Breakfast,Lunch,Dinner),Approved Student Bills</p>
+                <p class="text-small"> Explore our delicious Meals</p>
+                <div class="buttons">
+                    <button class="button" style="vertical-align:middle"><span><a href="/display_menu" style="color: white; text-decoration: none;">Check Menu</a></span></button>
+                    <button class="button" style="vertical-align:middle" ><span><a href="#" style="color: white; text-decoration: none;">Approved Mess Bills</a></span></button>
+                    <!-- <button class="button" style="vertical-align:middle" ><span><a href="/display_menu_for_student" style="color: white; text-decoration: none;">View Menu</a></span></button>
+                    <button class="button" style="vertical-align:middle" ><span><a href="#" style="color: white; text-decoration: none;">View Mess Bill</a></span></button> -->
+                </div>
+            </div> 
+        </div>
+
+    </section>
+</body>
+<!-- <script src="{{url_for('static' ,filename='js/script.js')}}"></script> -->
+<script>
+burger=document.querySelector('.burger')
+navbar=document.querySelector('.navbar')
+rightnav=document.querySelector('.rightnav')
+navlist=document.querySelector('.nav-list')
+
+burger.addEventListener('click',()=>{
+    rightnav.classList.toggle('v-class-resp');
+    navlist.classList.toggle('v-class-resp');
+    navbar.classList.toggle('h-nav-resp');
+})
+</script>
+</html>

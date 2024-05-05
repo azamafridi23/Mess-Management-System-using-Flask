@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <link rel="stylesheet" href="css/style.css">
+    
+
+    <title>Student_portal</title>
+</head>
+
+<body>
+
+    <nav class="navbar background h-nav-resp">
+        <ul class="nav-list v-class-resp">
+            <div class="Logo"> <img src="img/Logo.jpg" alt="error"></div>
+            <li><a href="#Home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Service</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="rightnav v-class-resp">
+            <input type="text" name="search" id="search">
+            <button class="btn btn-sn">Search</button>
+
+
+        </div>
+        <div class="burger">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+    </nav>
+
+    <section class="contact firstsection" id="contact">
+        <h2 class="text-center text-big">Bill Payment</h2>
+        <div class="form" style="background-size: cover; background-position: center center; height: 600px; ">
+            <input class="form-input" type="file" name="mess_bill" id="mess_bill_input" accept="image/*">
+            <img id="mess_bill_preview"  style="display: block; max-width: 100%; height: 50%; margin: auto;">
+            <button class="btn btn-dark1" onclick="submitForm()">Submit</button>
+        </div>
+    </section>
+    
+   
+    <footer class="background">
+        <p class="a">CopyRight &copy; www.AIinNorth.com 2023 All rights are reserved</p>
+
+    </footer>
+    <script src="js/resp.js"></script>
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    document.getElementById('mess_bill_preview').src = e.target.result;
+                    document.getElementById('mess_bill_preview').style.display = 'block';
+                }
+                
+                reader.readAsDataURL(input.files[0]); // convert to base64 string
+            }
+        }
+    
+        document.getElementById('mess_bill_input').addEventListener('change', function() {
+            readURL(this);
+        });
+    
+        function submitForm() {
+            // Code to submit the form with uploaded image
+            // You can add your form submission logic here
+        }
+    </script>
+</body>
+
+</html>

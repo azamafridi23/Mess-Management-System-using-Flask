@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mess In-Out</title>
+<style>
+    /* Add your CSS styles here */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .container {
+        text-align: center;
+    }
+    .checkbox-label {
+        margin-right: 10px;
+    }
+    .input-field {
+        margin-top: 10px;
+    }
+    .submit-button {
+        margin-top: 20px;
+    }
+</style>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    
+<div class="container text-center text-big">
+    <h2>Mess In-Out</h2>
+    <form id="messForm">
+        <label class="checkbox-label">
+            <input type="checkbox" name="messInOut" value="messIn">
+            Mess In
+        </label>
+        <label class="checkbox-label">
+            <input type="checkbox" name="messInOut" value="messOut">
+            Mess Out
+        </label>
+        <br>
+        <div class="form-input">
+            
+            <input type="datetime-local" id="dateTime" name="dateTime">
+        </div>
+        <button class="btn btn-dark" type="submit">submit</button>
+      
+    </form>
+</div>
+
+<script>
+    // Add your JavaScript code here
+    const form = document.getElementById('messForm');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form submission
+        const formData = new FormData(form);
+        const selectedOptions = formData.getAll('messInOut');
+        const dateTime = formData.get('dateTime');
+        // You can now process the selected options and datetime
+        console.log('Selected Options:', selectedOptions);
+        console.log('Date and Time:', dateTime);
+        // Add your logic to handle form submission here, like sending data to a server
+    });
+</script>
+</body>
+</html>
