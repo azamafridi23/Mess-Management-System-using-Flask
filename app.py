@@ -3,7 +3,7 @@ import time
 import os
 import hashlib
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 app=Flask(__name__)
 app.secret_key = 'FullStackProject'
 DATABASE = 'users.db'
@@ -109,7 +109,7 @@ def checkin():
         try:
             result = create_table_for_check_mess(conn1=conn_ld,conn2=conn_bf)
             # temp_db_cmnds()
-            if result =='fail':
+            if result =='failed':
                 return 'TABLE LD AND BF CREATION ERROR', 500
             
             data = request.form # change to change.form
@@ -135,7 +135,7 @@ def checkin():
                 
                 if last_entry is None:
                     print('a')
-                    cursor.execute('''INSERT INTO BREAKFAST (User_id, Check_status, Date,Time, Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,1))
+                    cursor.execute('''INSERT INTO BREAKFAST (User_id, Check_status, Date,Time, Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,0))
                     print('b')
                     conn_bf.commit()
                     print('c')
@@ -148,7 +148,7 @@ def checkin():
                     elif last_entry[2]=='IN':
                         return 'ALREADY MESS IN',200
                     else:
-                        counter = last_entry[5] + diff
+                        counter = diff
                         cursor.execute('''INSERT INTO BREAKFAST (User_id, Check_status, Date,Time, Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,counter))
                         conn_bf.commit()
                 # Don't forget to close the cursor and connection when done
@@ -164,7 +164,7 @@ def checkin():
                 # Print or process the last entry
                 print(f'last entry = {last_entry}')
                 if last_entry is None:
-                    cursor.execute('''INSERT INTO LD (User_id, Check_status, Date,Time, Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,1))
+                    cursor.execute('''INSERT INTO LD (User_id, Check_status, Date,Time, Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,0))
                     conn_ld.commit()
                 else:
                     last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
@@ -175,7 +175,7 @@ def checkin():
                     elif last_entry[2]=='IN':
                         return 'ALREADY MESS IN',200
                     else:
-                        counter = last_entry[5] + diff
+                        counter =  diff
                         cursor.execute('''INSERT INTO LD (User_id, Check_status, Date,Time,Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,counter))
                         conn_ld.commit()
                 # Don't forget to close the cursor and connection when done
@@ -275,72 +275,146 @@ def checkout():
 def student_check_mess_bill():
     BF_PRICE = 100
     LD_PRICE = 200
-    conn_ld,conn_bf = create_connection_for_check_mess()
-    if conn_ld is not None and conn_bf is not None:
-        user_id = session.get('user_id')
-        cursor_bf = conn_bf.cursor()
-        sql_query = "SELECT * FROM BREAKFAST WHERE User_id = ? ORDER BY id DESC LIMIT 1" # select last entry of User_id
-        # Execute the query with user_id=1
-        cursor_bf.execute(sql_query, (user_id,))
-        # Fetch the result
-        last_entry_bf = cursor_bf.fetchone()
+    try:
+
+        conn_ld,conn_bf = create_connection_for_check_mess()
+        if conn_ld is not None and conn_bf is not None:
+            user_id = session.get('user_id')
+            cursor_bf = conn_bf.cursor()
+            sql_query = "SELECT * FROM BREAKFAST WHERE User_id = ?" # select last entry of User_id
+            # Execute the query with user_id=1
+            cursor_bf.execute(sql_query, (user_id,))
+
+            result_bf = cursor_bf.fetchall()
+            if result_bf == []:
+                last_entry_bf = None
+            else:
+                # Fetch the result
+                last_entry_bf = result_bf[-1]
+
+            print(f'result_bf = {result_bf}')
+
+            cursor_ld = conn_ld.cursor()
+            sql_query2 = "SELECT * FROM LD WHERE User_id = ?" # select last entry of User_id
+            # Execute the query with user_id=1
+            cursor_ld.execute(sql_query2, (user_id,))
+            result_ld = cursor_ld.fetchall()
+            
+            print(f'ld = {result_ld}')
+            if result_ld == []:
+                last_entry_ld = None
+            else:
+                # Fetch the result
+                last_entry_ld = result_ld[-1]
+
+            print(f'result_bf = {result_bf}')
+
+            bf_check=True
+            ld_check=True
+            
+            total_bf_days = 0
+            total_ld_days = 0
+
+            if last_entry_ld is None and last_entry_bf is None:
+                return 'MESS WAS NOT IN. SO BILL IS 0',200
+            elif last_entry_bf is None:
+                bf_check=False
+            elif last_entry_ld is None:
+                ld_check=False
+
+            if bf_check:
+                last_entry_date_bf = datetime.strptime(last_entry_bf[3], "%Y-%m-%d").date()
+            if ld_check:    
+                last_entry_date_ld = datetime.strptime(last_entry_ld[3], "%Y-%m-%d").date()
+            current_date = datetime.now().date()
+
+            total_bf_price = 0
+            total_ld_price = 0
+            if bf_check and last_entry_bf[2]=='IN':
+                last_entry_date_bf = datetime.strptime(last_entry_bf[3], "%Y-%m-%d").date()
+                diff = (current_date-last_entry_date_bf).days
+
+                total_bf_days = last_entry_bf[5]+diff
+
+                total_bf_price = total_bf_days * BF_PRICE
+            elif bf_check:
+                total_bf_days = last_entry_bf[5]
+                total_bf_price = last_entry_bf[5] * BF_PRICE
+            
+            if ld_check and last_entry_ld[2]=='IN':
+                last_entry_date_ld = datetime.strptime(last_entry_ld[3], "%Y-%m-%d").date()
+                diff = (current_date-last_entry_date_ld).days
+
+                total_ld_days = last_entry_ld[5]+diff
+
+                total_ld_price = total_ld_days * LD_PRICE
+            elif ld_check:
+                total_ld_days = last_entry_ld[5]
+                total_ld_price = last_entry_ld[5] * LD_PRICE
+            
+            total_bill = total_bf_price + total_ld_price
+
+            # Convert each tuple to the desired format to pass it to dates_mess_was_in function
+            formatted_result_bf = [(status, date) for _, _, status, date, _, _ in result_bf]
+            formatted_result_ld = [(status, date) for _, _, status, date, _, _ in result_ld]
+
+            if len(formatted_result_bf)!=0:
+                dates_mess_in_bf = dates_mess_was_in(formatted_result_bf)
+            else:
+                dates_mess_in_bf = []
+            if len(formatted_result_ld)!=0:    
+                dates_mess_in_ld = dates_mess_was_in(formatted_result_ld)
+            else:
+                dates_mess_in_ld = []
+
+            print(f'dates_bf = {dates_mess_in_bf}')
+
+            print(f'dates_ld = {dates_mess_in_ld}')
+
+            # return f'total bill = {total_bill} because of {total_bf_days} Breakfasts and {total_ld_days} lunch&dinners',200
+            return render_template('check_mess_bill.html', 
+                       dates_in_bf=dates_mess_in_bf, 
+                       dates_in_ld=dates_mess_in_ld, 
+                       days_in_bf=total_bf_days, 
+                       days_in_ld=total_ld_days,
+                       total_bill = total_bill,
+                       ld_price=LD_PRICE,
+                       bf_price=BF_PRICE)
+        else:
+            return 'Database connection error', 500
+    except Exception as e:
+        return f'There is some issue with the system = {e}',500
 
 
-        cursor_ld = conn_ld.cursor()
-        sql_query = "SELECT * FROM LD WHERE User_id = ? ORDER BY id DESC LIMIT 1" # select last entry of User_id
-        # Execute the query with user_id=1
-        cursor_ld.execute(sql_query, (user_id,))
-        # Fetch the result
-        last_entry_ld = cursor_ld.fetchone()
 
-        bf_check=True
-        ld_check=True
-        
-        total_bf_days = 0
-        total_ld_days = 0
+def dates_mess_was_in(result):
+    dates_in = []
+    checked_in = False
+    last_checkin_date = None
 
-        if last_entry_ld is None and last_entry_bf is None:
-            return 'MESS WAS NOT IN. SO BILL IS 0',200
-        elif last_entry_bf is None:
-            bf_check=False
-        elif last_entry_ld is None:
-            ld_check=False
+    for status, date in result:
+        if status == 'IN':
+            checked_in = True
+            last_checkin_date = datetime.strptime(date, '%Y-%m-%d')
+        elif status == 'OUT':
+            if checked_in:
+                checkout_date = datetime.strptime(date, '%Y-%m-%d')
+                while last_checkin_date <= checkout_date:
+                    dates_in.append(last_checkin_date.strftime('%Y-%m-%d'))
+                    last_checkin_date += timedelta(days=1)
+            checked_in = False
 
-        if bf_check:
-            last_entry_date_bf = datetime.strptime(last_entry_bf[3], "%Y-%m-%d").date()
-        if ld_check:    
-            last_entry_date_ld = datetime.strptime(last_entry_ld[3], "%Y-%m-%d").date()
-        current_date = datetime.now().date()
+    # If checked in but not checked out until now, consider all days till now
+    if checked_in:
+        while last_checkin_date <= datetime.now():
+            dates_in.append(last_checkin_date.strftime('%Y-%m-%d'))
+            last_checkin_date += timedelta(days=1)
 
-        total_bf_price = 0
-        total_ld_price = 0
-        if bf_check and last_entry_bf[2]=='IN':
-            last_entry_date_bf = datetime.strptime(last_entry_bf[3], "%Y-%m-%d").date()
-            diff = (current_date-last_entry_date_bf).days
+    for i in result:
+        if i[0]=='OUT':
+            dates_in.remove(i[1])
 
-            total_bf_days = last_entry_bf[5]+diff
-
-            total_bf_price = total_bf_days * BF_PRICE
-        elif bf_check:
-            total_bf_days = last_entry_bf[5]
-            total_bf_price = last_entry_bf[5] * BF_PRICE
-        
-        if ld_check and last_entry_ld[2]=='IN':
-            last_entry_date_ld = datetime.strptime(last_entry_ld[3], "%Y-%m-%d").date()
-            diff = (current_date-last_entry_date_ld).days
-
-            total_ld_days = last_entry_ld[5]+diff
-
-            total_ld_price = total_ld_days * LD_PRICE
-        elif ld_check:
-            total_ld_days = last_entry_ld[5]
-            total_ld_price = last_entry_ld[5] * LD_PRICE
-        
-        total_bill = total_bf_price + total_ld_price
-
-        return f'total bill = {total_bill} because of {total_bf_days} Breakfasts and {total_ld_days} lunch&dinners',200
-    else:
-        return 'Database connection error', 500
+    return dates_in
 
 @app.route('/display_menu')
 def display_menu():
