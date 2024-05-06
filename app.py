@@ -448,8 +448,6 @@ def update_menu(menu_id):
                 return 'Failed to update menu', 500
     else:
         return 'Database connection error', 500
-
-
 @app.route('/menu/<int:menu_id>/delete', methods=['GET'])
 def delete_menu(menu_id):
     conn = create_connection_for_menu()
@@ -465,10 +463,6 @@ def delete_menu(menu_id):
             return 'Failed to delete menu', 500
     else:
         return 'Database connection error', 500
-
-
-
-
 # Function to get a database connection
 def get_db():
     db = getattr(g, '_database', None)
@@ -567,13 +561,10 @@ def signup2():
 @app.route('/supervisorView')
 def supervisorView():
     return render_template("/SuperVisorView.html")  
-
-
 @app.route('/aboutus')
 def aboutUs():
     # return render_template("/templates/AboutUs/aboutus.html")   
-    return render_template("/AboutUs/Aboutus.html")
-    
+    return render_template("/AboutUs/Aboutus.html")    
 #Student Portion 
 @app.route('/studentView')
 def studentView():
@@ -587,7 +578,6 @@ def auth():
     password = request.form['User_Password']
     # Hash the provided password for comparison
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
-
     # Retrieve user data from the database based on the email
     db = get_db()
     cursor = db.cursor()
