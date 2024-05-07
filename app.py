@@ -371,8 +371,18 @@ def student_check_mess_bill():
 
             print(f'dates_ld = {dates_mess_in_ld}')
 
+            user_db = get_db()
+            cursor_user = user_db.cursor()
+            cursor_user.execute('SELECT * FROM users WHERE id = ?', (user_id,))
+            existing_user = cursor_user.fetchone()
+
+            student_email = existing_user[2]
+            student_name = existing_user[1]
+
             # return f'total bill = {total_bill} because of {total_bf_days} Breakfasts and {total_ld_days} lunch&dinners',200
             return render_template('check_mess_bill.html', 
+                        student_email = existing_user[2] ,
+                        student_name=existing_user[1], 
                        dates_in_bf=dates_mess_in_bf, 
                        dates_in_ld=dates_mess_in_ld, 
                        days_in_bf=total_bf_days, 
@@ -384,7 +394,6 @@ def student_check_mess_bill():
             return 'Database connection error', 500
     except Exception as e:
         return f'There is some issue with the system = {e}',500
-
 
 
 def dates_mess_was_in(result):
@@ -415,6 +424,139 @@ def dates_mess_was_in(result):
             dates_in.remove(i[1])
 
     return dates_in
+
+@app.route('/track_students_attendance',methods=['GET','POST'])
+def track_students_attendance():
+    if request.method=='GET':
+        return render_template('track_students_attendance.html')
+    else:
+        email = request.form['student_email']
+        user_db = get_db()
+        cursor_user = user_db.cursor()
+        cursor_user.execute('SELECT * FROM users WHERE email = ?', (email,))
+        existing_user = cursor_user.fetchone()
+        print('existing_user = ',existing_user)
+        if existing_user is None:
+            return 'no user of this email'
+        else:
+            student_id = existing_user[0]
+            dates_mess_in_bf,dates_mess_in_ld, total_bf_days, total_ld_days,total_bill,LD_PRICE,BF_PRICE = student_mess_details(student_id)
+
+            return render_template('check_mess_bill.html',
+                                student_email = existing_user[2] ,
+                                student_name=existing_user[1], 
+                        dates_in_bf=dates_mess_in_bf, 
+                        dates_in_ld=dates_mess_in_ld, 
+                        days_in_bf=total_bf_days, 
+                        days_in_ld=total_ld_days,
+                        total_bill = total_bill,
+                        ld_price=LD_PRICE,
+                        bf_price=BF_PRICE)
+
+
+def student_mess_details(user_id):
+    BF_PRICE = 100
+    LD_PRICE = 200
+    try:
+        conn_ld,conn_bf = create_connection_for_check_mess()
+        if conn_ld is not None and conn_bf is not None:
+            cursor_bf = conn_bf.cursor()
+            sql_query = "SELECT * FROM BREAKFAST WHERE User_id = ?" # select last entry of User_id
+            # Execute the query with user_id=1
+            cursor_bf.execute(sql_query, (user_id,))
+
+            result_bf = cursor_bf.fetchall()
+            if result_bf == []:
+                last_entry_bf = None
+            else:
+                # Fetch the result
+                last_entry_bf = result_bf[-1]
+
+            print(f'result_bf = {result_bf}')
+
+            cursor_ld = conn_ld.cursor()
+            sql_query2 = "SELECT * FROM LD WHERE User_id = ?" # select last entry of User_id
+            # Execute the query with user_id=1
+            cursor_ld.execute(sql_query2, (user_id,))
+            result_ld = cursor_ld.fetchall()
+            
+            print(f'ld = {result_ld}')
+            if result_ld == []:
+                last_entry_ld = None
+            else:
+                # Fetch the result
+                last_entry_ld = result_ld[-1]
+
+            print(f'result_bf = {result_bf}')
+
+            bf_check=True
+            ld_check=True
+            
+            total_bf_days = 0
+            total_ld_days = 0
+
+            if last_entry_ld is None and last_entry_bf is None:
+                return 'MESS WAS NOT IN. SO BILL IS 0',200
+            elif last_entry_bf is None:
+                bf_check=False
+            elif last_entry_ld is None:
+                ld_check=False
+
+            if bf_check:
+                last_entry_date_bf = datetime.strptime(last_entry_bf[3], "%Y-%m-%d").date()
+            if ld_check:    
+                last_entry_date_ld = datetime.strptime(last_entry_ld[3], "%Y-%m-%d").date()
+            current_date = datetime.now().date()
+
+            total_bf_price = 0
+            total_ld_price = 0
+            if bf_check and last_entry_bf[2]=='IN':
+                last_entry_date_bf = datetime.strptime(last_entry_bf[3], "%Y-%m-%d").date()
+                diff = (current_date-last_entry_date_bf).days
+
+                total_bf_days = last_entry_bf[5]+diff
+
+                total_bf_price = total_bf_days * BF_PRICE
+            elif bf_check:
+                total_bf_days = last_entry_bf[5]
+                total_bf_price = last_entry_bf[5] * BF_PRICE
+            
+            if ld_check and last_entry_ld[2]=='IN':
+                last_entry_date_ld = datetime.strptime(last_entry_ld[3], "%Y-%m-%d").date()
+                diff = (current_date-last_entry_date_ld).days
+
+                total_ld_days = last_entry_ld[5]+diff
+
+                total_ld_price = total_ld_days * LD_PRICE
+            elif ld_check:
+                total_ld_days = last_entry_ld[5]
+                total_ld_price = last_entry_ld[5] * LD_PRICE
+            
+            total_bill = total_bf_price + total_ld_price
+
+            # Convert each tuple to the desired format to pass it to dates_mess_was_in function
+            formatted_result_bf = [(status, date) for _, _, status, date, _, _ in result_bf]
+            formatted_result_ld = [(status, date) for _, _, status, date, _, _ in result_ld]
+
+            if len(formatted_result_bf)!=0:
+                dates_mess_in_bf = dates_mess_was_in(formatted_result_bf)
+            else:
+                dates_mess_in_bf = []
+            if len(formatted_result_ld)!=0:    
+                dates_mess_in_ld = dates_mess_was_in(formatted_result_ld)
+            else:
+                dates_mess_in_ld = []
+
+            print(f'dates_bf = {dates_mess_in_bf}')
+
+            print(f'dates_ld = {dates_mess_in_ld}')
+
+            # return f'total bill = {total_bill} because of {total_bf_days} Breakfasts and {total_ld_days} lunch&dinners',200
+            return [dates_mess_in_bf,dates_mess_in_ld, total_bf_days, total_ld_days,total_bill,LD_PRICE,BF_PRICE]
+        else:
+            return 'Database connection error', 500
+    except Exception as e:
+        return f'There is some issue with the system = {e}'
 
 @app.route('/display_menu')
 def display_menu():
