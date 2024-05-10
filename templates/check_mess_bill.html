@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Display</title>
+</head>
+<body>
+    <h1>STUDENT NAME = {{student_name}}</h1>
+    <h1>STUDENT EMAIL = {{student_email}}</h1>
+    <hr>
+    <p>ONE DAY PRICE OF LD = {{ld_price}}</p>
+    <p>ONE DAY PRICE OF BF = {{bf_price}}</p>
+    <hr>
+    <h1>Total Bill = {{total_bill}}</h1>
+    <hr>
+    <h3>BF DAYS = {{days_in_bf}}</h3>
+    <h3>LD DAYS = {{days_in_ld}}</h3>
+    <hr>
+    <h1>Mess In - Breakfast</h1>
+    <ul>
+        {% for value in dates_in_bf %}
+            <li>{{ value }}</li>
+        {% endfor %}
+    </ul>
+    <hr>
+    <h1>Mess In - Lunch & Dinner</h1>
+    <ul>
+        {% for value in dates_in_ld %}
+            <li>{{ value }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
