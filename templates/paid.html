@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unicons.iconscout.com/release/v4.0.0/css/line.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static' ,filename='css/style.css')}}"
+    />
+    <script src="script.js" defer></script>
+    <title>Payment Form</title>
+    <style>
+      /* Default styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 10px;
+        margin-top: 20px;
+      }
+
+      form {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      input[type="email"],
+      input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      input[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+
+      .message {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f2f2f2;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-align: center;
+      }
+
+      .message p {
+        margin: 0;
+        color: #333;
+      }
+
+      input[type="email"]::placeholder,
+      input[type="text"]::placeholder {
+        color: #999; /* Placeholder text color */
+        font-size: 15px;
+      }
+
+      /* Responsive styles */
+      @media screen and (max-width: 600px) {
+        form {
+          padding: 0 20px;
+        }
+
+        .message {
+          padding: 5px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar background h-nav-resp">
+      <ul class="nav-list v-class-resp">
+        <div class="Logo">
+          <img src="/static/Images/logo.webp" alt="error" />
+        </div>
+        <li><a href="#Home">Home</a></li>
+        <li><a href="/aboutus">AboutUs</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+
+      <div class="burger">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+    </nav>
+
+   
+      <h1>Payment Form</h1>
+      <form action="/paidamount" method="POST" enctype="multipart/form-data">
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+        /><br /><br />
+
+        <input
+          type="text"
+          id="amount"
+          name="amount"
+          placeholder="Enter the paid amount"
+          required
+        /><br /><br />
+
+        <input type="submit" value="Submit" />
+
+        {% if message %}
+        <div class="message">
+          <p>{{ message }}</p>
+        </div>
+        {% endif %}
+      </form>
+    
+
+     
+    </section>
+   
+  </body>
+</html>

@@ -107,14 +107,15 @@ border-radius: 3px;
 
 }
 
+
 .background {
-background: rgba(0, 0, 0, 0.7) url('../img/mess2.jpeg');
+background: rgba(0, 0, 0, 0.7) url('../Images/CenterMassPic.jpg');
 background-size: cover;
 background-blend-mode: darken;
 }
 
 .background1 {
-background: rgba(0, 0, 0, 0.4) url('../img/mess3.jpeg');
+background: rgba(0, 0, 0, 0.4) url('../Images/CenterMassPic.jpg');
 background-size: cover;
 background-blend-mode: darken;
 }

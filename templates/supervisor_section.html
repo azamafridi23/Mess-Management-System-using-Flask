@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+    rel="stylesheet"
+    href="{{url_for('static' ,filename='css/style.css')}}"
+  />
+    <title>Supervisor Section</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        form {
+            display: flex;
+            align-items: center;
+        }
+        select, button {
+            margin-right: 10px;
+        }
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar background h-nav-resp">
+        <ul class="nav-list v-class-resp">
+          <div class="Logo">
+            <img src="/static/Images/logo.webp" alt="error" />
+          </div>
+          <li><a href="#Home">Home</a></li>
+          <li><a href="/aboutus">AboutUs</a></li>
+          <li><a href="/login">Login</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+  
+        <div class="burger">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+        </div>
+      </nav>
+    <div class="container">
+        <h1>Supervisor Section</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Email</th>
+                    <th>Amount</th>
+                    <th>Approval Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment[0] }}</td>
+                        <td>{{ payment[1] }}</td>
+                        <td>{{ payment[2] }}</td>
+                        <td>{{ payment[3] }}</td>  <!-- Display approval status -->
+                        <td>
+                            <form action="{{ url_for('supervisor_section') }}" method="post">
+                                <input type="hidden" name="payment_id" value="{{ payment[0] }}">
+                                <select name="approval_status">
+                                    <option value="Approved">Approved</option>
+                                    <option value="Not Approved">Not Approved</option>
+                                </select>
+                                <button type="submit">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
