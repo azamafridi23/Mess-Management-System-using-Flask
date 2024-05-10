@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .zoom-on-hover:hover {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5" style="text-align: center;">GIKI Mess Menu</h1>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Day</th>
+                        <th>Breakfast</th>
+                        <th>Lunch</th>
+                        <th>Dinner</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in menu_data %}
+                    <tr>
+                        <td class="zoom-on-hover">{{ item[1] }}</td> <!-- Day -->
+                        <td class="zoom-on-hover">{{ item[2] }}</td> <!-- Breakfast -->
+                        <td class="zoom-on-hover">{{ item[3] }}</td> <!-- Lunch -->
+                        <td class="zoom-on-hover">{{ item[4] }}</td> <!-- Dinner -->
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
