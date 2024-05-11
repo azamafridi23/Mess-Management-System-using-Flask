@@ -2,33 +2,125 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />   
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+    <link rel="stylesheet" href="{{url_for('static' ,filename='css/style.css')}}">
+   <script src="script.js" defer></script>
+
     <title>List Display</title>
+    <style>
+        /* Reset default styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h3 {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        h3 {
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        p, ul {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        ul li {
+            list-style: none;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px solid #ccc;
+        }
+
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1, h3, p {
+                font-size: 18px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>STUDENT NAME = {{student_name}}</h1>
-    <h1>STUDENT EMAIL = {{student_email}}</h1>
-    <hr>
-    <p>ONE DAY PRICE OF LD = {{ld_price}}</p>
-    <p>ONE DAY PRICE OF BF = {{bf_price}}</p>
-    <hr>
-    <h1>Total Bill = {{total_bill}}</h1>
-    <hr>
-    <h3>BF DAYS = {{days_in_bf}}</h3>
-    <h3>LD DAYS = {{days_in_ld}}</h3>
-    <hr>
-    <h1>Mess In - Breakfast</h1>
-    <ul>
-        {% for value in dates_in_bf %}
-            <li>{{ value }}</li>
-        {% endfor %}
-    </ul>
-    <hr>
-    <h1>Mess In - Lunch & Dinner</h1>
-    <ul>
-        {% for value in dates_in_ld %}
-            <li>{{ value }}</li>
-        {% endfor %}
-    </ul>
+
+    <nav class="navbar background h-nav-resp">
+        <ul class="nav-list v-class-resp">
+            <div class="Logo"> <img src="/static/Images/logo.webp" alt="error"></div>
+            <li><a href="#Home">Home</a></li>
+            <li><a href="/aboutus">AboutUs</a></li>
+            <li><a href="/login">Login</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+     
+        <div class="burger">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+    </nav>
+
+
+
+    <div class="container">
+        <h1>STUDENT NAME = {{student_name}}</h1>
+        <h1>STUDENT EMAIL = {{student_email}}</h1>
+        <hr>
+        <p>ONE DAY PRICE OF LD = {{ld_price}}</p>
+        <p>ONE DAY PRICE OF BF = {{bf_price}}</p>
+        <hr>
+        <h1>Total Bill = {{total_bill}}</h1>
+        <hr>
+        <h3>BF DAYS = {{days_in_bf}}</h3>
+        <h3>LD DAYS = {{days_in_ld}}</h3>
+        <hr>
+        <h1>Mess In - Breakfast</h1>
+        <ul>
+            {% for value in dates_in_bf %}
+                <li>{{ value }}</li>
+            {% endfor %}
+        </ul>
+        <hr>
+        <h1>Mess In - Lunch & Dinner</h1>
+        <ul>
+            {% for value in dates_in_ld %}
+                <li>{{ value }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>
