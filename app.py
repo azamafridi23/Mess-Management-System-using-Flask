@@ -637,7 +637,7 @@ def create_menu_auth():
             existing_menu = cursor.fetchone()
             if existing_menu:
                 flash('Menu for this Day already Exist', 'error')
-                return redirect(url_for("display_menu"))
+                return redirect(url_for("create_menu"))
             else:
                 # If menu for the day doesn't exist, create a new one
                 cursor.execute('''
@@ -646,7 +646,7 @@ def create_menu_auth():
                 conn.commit()
                 conn.close()
                 flash('Menu Added Successfully', 'success')
-                return redirect(url_for("display_menu"))
+                return redirect(url_for("create_menu"))
         except sqlite3.Error as e:
             conn.rollback()
             print(e)

@@ -100,7 +100,7 @@
     </div>
     <div class="container">
         <h1>Create Menu</h1>
-        <form id="createMenuForm" method="POST" action="/create_menu_auth" onsubmit="showAlertAndRedirect()">
+        <form id="createMenuForm" method="POST" action="/create_menu_auth">
             <label for="day">Day:</label>
             <select name="day" id="day">
                 <option value="Monday">Monday</option>
@@ -120,16 +120,6 @@
             <button type="submit">Create Menu</button>
         </form>
     </div>
-        <script>
-          function showAlertAndRedirect() {
-  // Display the alert message
-  alert('Menu for this day already exists');
-
-  // Redirect to the new function
-  window.location.href = '/display_menu';
-}
-
-        </script>
         
 </body>
 </html>
