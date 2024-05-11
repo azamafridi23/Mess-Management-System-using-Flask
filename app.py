@@ -618,6 +618,7 @@ def create_menu():
         return 'NOT ALLOWED'
     else:
         return render_template("/create_menu.html")
+
 @app.route('/create_menu_auth', methods=['POST'])
 def create_menu_auth():
     conn = create_connection_for_menu()
@@ -635,21 +636,23 @@ def create_menu_auth():
             ''', (day,))
             existing_menu = cursor.fetchone()
             if existing_menu:
-                return jsonify({'error': 'Menu for this day already exists '}), 400
-            
-            # If menu for the day doesn't exist, create a new one
-            cursor.execute('''
-                INSERT INTO menu (day, breakfast, lunch, dinner) VALUES (?, ?, ?, ?)
-            ''', (day, breakfast, lunch, dinner))
-            conn.commit()
-            conn.close()
-            return jsonify({'message': 'Menu created successfully'}), 201
+                flash('Menu for this Day already Exist', 'error')
+                return redirect(url_for("display_menu"))
+            else:
+                # If menu for the day doesn't exist, create a new one
+                cursor.execute('''
+                    INSERT INTO menu (day, breakfast, lunch, dinner) VALUES (?, ?, ?, ?)
+                ''', (day, breakfast, lunch, dinner))
+                conn.commit()
+                conn.close()
+                flash('Menu Added Successfully', 'success')
+                return redirect(url_for("display_menu"))
         except sqlite3.Error as e:
             conn.rollback()
             print(e)
-            return jsonify({'error': 'Failed to create menu'}), 500
+            return jsonify({'error': 'Failed to create menu'}),500
     else:
-        return jsonify({'error': 'Database connection error'}), 500
+        return jsonify({'error': 'Database connection error'}),500
 
     
 @app.route('/menu/<int:menu_id>/update', methods=['GET', 'POST'])
