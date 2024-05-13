@@ -596,19 +596,22 @@ def display_menu():
 def display_menu2():
     u_type = session.get('User_Type')
     print(f'u_type = {u_type}')
-    conn = create_connection_for_menu()
-    if conn is not None:
-        try:
-            cursor = conn.cursor()
-            cursor.execute('SELECT * FROM menu')
-            menu_data = cursor.fetchall()
-            conn.close()
-            return render_template('display_menu_for_Student.html', menu_data=menu_data)
-        except sqlite3.Error as e:
-            print(e)
-            return 'Failed to fetch menu data', 500
+    if u_type=='Student':
+        conn = create_connection_for_menu()
+        if conn is not None:
+            try:
+                cursor = conn.cursor()
+                cursor.execute('SELECT * FROM menu')
+                menu_data = cursor.fetchall()
+                conn.close()
+                return render_template('display_menu_for_Student.html', menu_data=menu_data)
+            except sqlite3.Error as e:
+                print(e)
+                return 'Failed to fetch menu data', 500
+        else:
+            return 'Database connection error', 500
     else:
-        return 'Database connection error', 500
+        return 'NOT ALLOWED'
 
   
 @app.route("/create_menu")
@@ -974,5 +977,9 @@ def signup_function():
 # def signup():
 #     return render_template("/Login/signup.html")
 
-if __name__=='__main__':
+def run_app():
     app.run(debug=True)
+    return app
+
+if __name__=='__main__':
+    app = run_app()
