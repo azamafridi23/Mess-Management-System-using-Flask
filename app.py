@@ -411,7 +411,7 @@ def student_check_mess_bill():
 @app.route('/check_monthly_bill',methods=['GET','POST'])
 def check_monthly_bill():
     user_type=session.get('User_Type')
-    if user_type in ["Student",'Supervisor']:
+    if user_type not in ["Student",'Supervisor']:
         return 'Not allowed'
     else:
         BF_PRICE = 100
@@ -419,8 +419,8 @@ def check_monthly_bill():
         try:
             conn_ld,conn_bf = create_connection_for_check_mess()
             if conn_ld is not None and conn_bf is not None:
-                user_id = 2
-                month = request.json['month']
+                user_id = session.get('user_id')
+                month = request.form['month'] # .json
                 print('month = ',month)
                 cursor_bf = conn_bf.cursor()
                 sql_query = "SELECT * FROM BREAKFAST WHERE User_id = ? AND strftime('%Y-%m', Date) = ?"
