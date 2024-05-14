@@ -9,3 +9,6 @@ def test_student_check_mess_bill_success(client):
 
     assert response.status_code == 200
     assert b'student@gmail.com' in response.data 
+
+
+
