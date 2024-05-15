@@ -148,9 +148,13 @@ def checkin():
                         diff = (current_date - last_entry_date).days
                         print(f'diff = {diff}')
                         if current_time.hour > 20:
-                            return 'NOT ALLOWED TO MESS IN AFTER 11',200
+                            flash('NOT ALLOWED TO MESS IN AFTER 11', 'success')
+                            return redirect(url_for("checkin"))
+                        
                         elif last_entry[2]=='IN':
-                            return 'ALREADY MESS IN',200
+                            # return 'ALREADY MESS IN',200
+                            flash('ALREADY MESS In', 'success')
+                            return redirect(url_for("checkin"))
                         else:
                             counter = diff
                             cursor.execute('''INSERT INTO BREAKFAST (User_id, Check_status, Date,Time, Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,counter))
@@ -175,9 +179,13 @@ def checkin():
                         diff = (current_date - last_entry_date).days
                         print(f'diff = {diff}')
                         if current_time.hour > 20:
-                            return 'NOT ALLOWED TO MESS IN AFTER 11',200
+                            # return 'NOT ALLOWED TO MESS IN AFTER 11',200
+                            flash('NOT ALLOWED TO MESS IN AFTER 11', 'success')
+                            return redirect(url_for("checkin"))
                         elif last_entry[2]=='IN':
-                            return 'ALREADY MESS IN',200
+                            # return 'ALREADY MESS IN',200
+                            flash('Mess Already In', 'success')
+                            return redirect(url_for("checkin"))
                         else:
                             counter =  diff
                             cursor.execute('''INSERT INTO LD (User_id, Check_status, Date,Time,Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'IN',current_date_str,current_time_str,counter))
@@ -185,7 +193,9 @@ def checkin():
                     # Don't forget to close the cursor and connection when done
                     cursor.close()
                     conn_ld.close()
-                return 'ok'
+                # return 'ok'
+                flash('Your Mess Is In Now', 'success')
+                return redirect(url_for("checkin"))
             except sqlite3.Error as e:
                 print('xx = ',e)
                 return 'STUDENT_CHECKIN VIEW ERROR', 500
@@ -230,15 +240,21 @@ def checkout():
                     print(f'le = ',last_entry)
                     
                     if last_entry is None:
-                        return 'MESS ALREADY OUT',200
+                        # return 'MESS ALREADY OUT',200
+                        flash('MESS ALREADY OUT', 'success')
+                        return redirect(url_for("checkout"))
                     else:
                         last_entry_date = datetime.strptime(last_entry[3], "%Y-%m-%d").date()
                         diff = (current_date - last_entry_date).days
                         print(f'diff = {diff}')
                         if current_time.hour > 20:
-                            return 'NOT ALLOWED TO MESS OUT AFTER 11',200
+                            # return 'NOT ALLOWED TO MESS OUT AFTER 11',200
+                            flash('NOT ALLOWED TO MESS OUT AFTER 11', 'success')
+                            return redirect(url_for("checkout"))
                         elif last_entry[2]=='OUT':
-                            return 'ALREADY MESS OUT',200
+                            # return 'ALREADY MESS OUT',200
+                            flash('MESS ALREADY OUT', 'success')
+                            return redirect(url_for("checkout"))
                         else:
                             counter = last_entry[5] + diff
                             cursor.execute('''INSERT INTO BREAKFAST (User_id, Check_status, Date,Time, Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'OUT',current_date_str,current_time_str,counter))
@@ -262,9 +278,13 @@ def checkout():
                         diff = (current_date - last_entry_date).days
                         print(f'diff = {diff}')
                         if current_time.hour > 20:
-                            return 'NOT ALLOWED TO MESS OUT AFTER 11',200
+                            # return 'NOT ALLOWED TO MESS OUT AFTER 11',200
+                            flash('NOT ALLOWED TO MESS OUT AFTER 11', 'success')
+                            return redirect(url_for("checkout"))
                         elif last_entry[2]=='OUT':
-                            return 'ALREADY MESS OUT',200
+                            # return 'ALREADY MESS OUT',200
+                            flash('MESS ALREADY OUT', 'success')
+                            return redirect(url_for("checkout"))
                         else:
                             counter = last_entry[5] + diff
                             cursor.execute('''INSERT INTO LD (User_id, Check_status, Date,Time,Counter) VALUES (?, ?, ?, ?,?)''', (user_id,'OUT',current_date_str,current_time_str,counter))
@@ -272,7 +292,9 @@ def checkout():
                     # Don't forget to close the cursor and connection when done
                     cursor.close()
                     conn_ld.close()
-                return 'ok'
+                # return 'ok'
+                flash('YOUR MESS IS OUT NOW', 'success')
+                return redirect(url_for("checkout"))
             except sqlite3.Error as e:
                 print('xx = ',e)
                 return 'STUDENT_CHECKIN VIEW ERROR', 500
