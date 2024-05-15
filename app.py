@@ -977,7 +977,7 @@ def supervisor_section():
                 return render_template("supervisor_section.html", payments=payments)
             except Exception as e:
                 flash(f'An error occurred while fetching payments: {str(e)}', 'error')
-                return redirect(url_for('index'))  # Redirect to index page or any error handling page
+                return redirect(url_for('/'))  # Redirect to index page or any error handling page
         elif request.method == 'POST':
             try:
                 payment_id = request.form.get('payment_id')
