@@ -413,15 +413,20 @@ def student_check_mess_bill():
                 student_email = existing_user[2]
                 student_name = existing_user[1]
 
+                NEW_TOTAL_BF_PRICE = len(dates_mess_in_bf) * BF_PRICE
+                NEW_TOTAL_LD_PRICE = len(dates_mess_in_ld) * LD_PRICE
+                NEW_TOTAL_PRICE = NEW_TOTAL_BF_PRICE + NEW_TOTAL_LD_PRICE
+                print(f'total_bill = {total_bill}, total_bf_price = {total_bf_price}')
+
                 # return f'total bill = {total_bill} because of {total_bf_days} Breakfasts and {total_ld_days} lunch&dinners',200
                 return render_template('check_mess_bill.html', 
                             student_email = existing_user[2] ,
                             student_name=existing_user[1], 
                         dates_in_bf=dates_mess_in_bf, 
                         dates_in_ld=dates_mess_in_ld, 
-                        days_in_bf=total_bf_days, 
-                        days_in_ld=total_ld_days,
-                        total_bill = total_bill,
+                        days_in_bf=len(dates_mess_in_bf), 
+                        days_in_ld=len(dates_mess_in_ld),
+                        total_bill = NEW_TOTAL_PRICE,
                         ld_price=LD_PRICE,
                         bf_price=BF_PRICE)
             else:
